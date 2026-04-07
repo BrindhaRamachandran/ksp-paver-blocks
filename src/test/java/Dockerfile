@@ -1,5 +1,14 @@
-FROM maven:3.9.6-eclipse-temurin-17
+# Use Maven image to build
+FROM maven:3.9.2-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY . /app
-RUN mvn -f /app/pom.xml clean package -DskipTests
-CMD ["java", "-jar", "/app/target/*.jar"]
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Use JDK for runtime
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
