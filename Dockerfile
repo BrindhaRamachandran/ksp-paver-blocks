@@ -1,33 +1,14 @@
-# Stage 1: Build the Spring Boot JAR
-FROM maven:3.9.3-eclipse-temurin-17 AS build
-
+# Use Maven image to build
+FROM maven:3.9.2-eclipse-temurin-17 AS build
 WORKDIR /app
-
-# Copy Maven config first to cache dependencies
 COPY pom.xml .
-
-# Download dependencies
-RUN mvn dependency:go-offline -B
-
-# Copy the source code
+RUN mvn dependency:go-offline
 COPY src ./src
-
-# Build the project (skip tests)
 RUN mvn clean package -DskipTests
 
-# Stage 2: Run the Spring Boot application
-FROM eclipse-temurin:17-jdk-alpine
-
+# Use JDK for runtime
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
-
-# Copy the JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
-
-# Expose application port
-EXPOSE 9090
-
-# Pass the MAIL_PASSWORD environment variable at runtime
-ENV MAIL_PASSWORD=${MAIL_PASSWORD}
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
