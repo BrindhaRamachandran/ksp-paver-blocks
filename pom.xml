@@ -65,6 +65,12 @@
           <mainClass>com.example.demo.Application</mainClass>
         </configuration>
       </plugin>
+             <!-- Maven Site Plugin (added) -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>3.13.0</version>
+    </plugin>
     </plugins>
   </build>
 </project>
