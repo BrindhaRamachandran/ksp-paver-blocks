@@ -21,6 +21,7 @@
 
   <properties>
     <java.version>17</java.version>
+    <maven.plugin.validation>BRIEF</maven.plugin.validation>
   </properties>
 
   <dependencies>
