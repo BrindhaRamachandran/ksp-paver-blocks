@@ -1,75 +1,72 @@
-<<<<<<< HEAD
-const navlinks = document.querySelectorAll(".nav-menu .nav-link");
-const menuOpenButton = document.querySelector("#menu-open-button");
-const menuCloseButton = document.querySelector("#menu-close-button");
+document.addEventListener('DOMContentLoaded', function () {
+    // ── Mobile Menu ──
+    const menuOpenButton = document.querySelector("#menu-open-button");
+    const menuCloseButton = document.querySelector("#menu-close-button");
+    const navLinks = document.querySelectorAll(".nav-menu .nav-link");
 
-	menuOpenButton.addEventListener("click", () => {
-// toggle mobile menu vivibility
-	document.body.classList.toggle("show-mobile-menu");
-	});
+    if (menuOpenButton) {
+        menuOpenButton.addEventListener("click", () => {
+            document.body.classList.add("show-mobile-menu");
+        });
+    }
 
-// close menu when the close button is clicked
-	menuCloseButton.addEventListener("click", () => menuOpenButton.click());
+    if (menuCloseButton) {
+        menuCloseButton.addEventListener("click", () => {
+            document.body.classList.remove("show-mobile-menu");
+        });
+    }
 
-// close menu when the nav link is clicked
-	navlinks.forEach(link => {
-	    link.addEventListener("click", () => menuOpenButton.click());
-	});
-	
-	document.getElementById("contactForm").addEventListener("submit", function (e) {
-	    e.preventDefault(); // stop page refresh
+    navLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            document.body.classList.remove("show-mobile-menu");
 
-	    fetch("http://localhost:8080/api/contact", {
-	        method: "POST",
-	        headers: {
-	            "Content-Type": "application/json"
-	        },
-	        body: JSON.stringify({
-	            name: document.getElementById("name").value,
-	            email: document.getElementById("email").value,
-	            message: document.getElementById("message").value
-	        })
-	    })
-	    .then(res => res.text())
-	    .then(data => alert(data))
-	    .catch(err => console.error(err));
-	});
+            setTimeout(() => {
+                const href = link.getAttribute("href");
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 350);
+        });
+    });
 
-=======
-const navlinks = document.querySelectorAll(".nav-menu .nav-link");
-const menuOpenButton = document.querySelector("#menu-open-button");
-const menuCloseButton = document.querySelector("#menu-close-button");
+    // ── Contact Form ──
+    const form = document.getElementById('contact-form');
 
-	menuOpenButton.addEventListener("click", () => {
-// toggle mobile menu vivibility
-	document.body.classList.toggle("show-mobile-menu");
-	});
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
 
-// close menu when the close button is clicked
-	menuCloseButton.addEventListener("click", () => menuOpenButton.click());
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
 
-// close menu when the nav link is clicked
-	navlinks.forEach(link => {
-	    link.addEventListener("click", () => menuOpenButton.click());
-	});
-	
-	document.getElementById("contactForm").addEventListener("submit", function (e) {
-	    e.preventDefault(); // stop page refresh
+            if (!name || !email || !message) {
+                alert('Please fill all fields.');
+                return;
+            }
 
-	    fetch("http://localhost:8080/api/contact", {
-	        method: "POST",
-	        headers: {
-	            "Content-Type": "application/json"
-	        },
-	        body: JSON.stringify({
-	            name: document.getElementById("name").value,
-	            email: document.getElementById("email").value,
-	            message: document.getElementById("message").value
-	        })
-	    })
-	    .then(res => res.text())
-	    .then(data => alert(data))
-	    .catch(err => console.error(err));
-	});
-
->>>>>>> 21f175a2d7df3dd6d9d732ae4c6d5b97313d4a60
+            fetch('https://ksp-pavers-app.onrender.com/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, message })
+            })
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) throw new Error(text || "Something went wrong");
+                return text;
+            })
+            .then(msg => {
+                alert(msg);
+                form.reset();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Failed to submit: " + err.message);
+            });
+        });
+    }
+});
